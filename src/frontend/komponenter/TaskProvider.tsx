@@ -29,7 +29,7 @@ const TaskReducer = (state: IState, action: IAction): IState => {
         case actions.HENT_TASKS: {
             return {
                 ...state,
-                Task: {
+                tasks: {
                     status: RessursStatus.HENTER,
                 },
             };
@@ -37,13 +37,13 @@ const TaskReducer = (state: IState, action: IAction): IState => {
         case actions.HENT_TASKS_SUKSESS: {
             return {
                 ...state,
-                Task: action.payload,
+                tasks: action.payload,
             };
         }
         case actions.HENT_TASKS_FEILET: {
             return {
                 ...state,
-                Task: action.payload,
+                tasks: action.payload,
             };
         }
         default: {
@@ -54,7 +54,7 @@ const TaskReducer = (state: IState, action: IAction): IState => {
 
 const TaskProvider: React.StatelessComponent = ({ children }) => {
     const [state, dispatch] = React.useReducer(TaskReducer, {
-        Tasks: byggTomRessurs<ITask[]>(),
+        tasks: byggTomRessurs<ITask[]>(),
     });
 
     React.useEffect(() => {

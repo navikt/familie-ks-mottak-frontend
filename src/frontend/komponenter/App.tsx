@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { hentInnloggetBruker } from '../api/saksbehandler';
 import { ISaksbehandler } from '../typer/saksbehandler';
 import Dekoratør from './Felleskomponenter/Dekoratør/Dekoratør';
+import Tasks from './Task/Tasks';
 import { TaskProvider } from './TaskProvider';
 
 const App: React.FunctionalComponent = () => {
@@ -30,7 +31,7 @@ const App: React.FunctionalComponent = () => {
                             exact={true}
                             path="/"
                             render={({ match }) => {
-                                return <div />;
+                                return <Tasks />;
                             }}
                         />
                     </Switch>
