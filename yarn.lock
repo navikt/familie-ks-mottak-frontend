@@ -3582,6 +3582,11 @@ lodash.memoize@^4.1.2:
   resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
   integrity sha1-vMbEmkKihA7Zl/Mj6tpezRguC/4=
 
+lodash.throttle@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
+  integrity sha1-wj6RtxAkKscMN/HhzaknTMOb8vQ=
+
 lodash.uniq@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
@@ -3965,6 +3970,16 @@ nanomatch@^1.2.9:
     regex-not "^1.0.0"
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
+
+nav-frontend-alertstriper-style@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/nav-frontend-alertstriper-style/-/nav-frontend-alertstriper-style-2.0.5.tgz#ad072883ce76b702f3452faaf90b965b7c5ad2ae"
+  integrity sha512-I8ri3vb5lU22jJGPCCBrHJr2WMd5oYsU6VHxAHHUx6jqZSkRA026oWJxHByzgrdvWFeRA4WzoclAuajfxq9lmw==
+
+nav-frontend-alertstriper@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/nav-frontend-alertstriper/-/nav-frontend-alertstriper-3.0.6.tgz#c9f826de94f15b010d2b250e8007bf1757f171b3"
+  integrity sha512-XgybVfJZi1Aq4E4T0DQiMDKtuilX3fxJdjwPg1H2/C86lmslYwRdzbfUlZksRbsJPE9jCY0B5pM5GbZtJuFMhQ==
 
 nav-frontend-core@^4.0.10:
   version "4.0.10"

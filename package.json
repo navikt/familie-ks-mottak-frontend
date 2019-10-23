@@ -7,6 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "NODE_ENV=production node node_dist/server.js",
+    "start:mock": "NODE_ENV=development node dev-server/mock-server.js",
     "start:dev": "tsc && NODE_ENV=development node node_dist/server.js",
     "build": "yarn build:prod",
     "build:prod": "tsc & webpack --config ./build_n_deploy/webpack/webpack.prod.js"
@@ -43,9 +44,12 @@
     "helmet": "^3.21.1",
     "http-proxy-middleware": "^0.20.0",
     "https-proxy-agent": "^3.0.0",
+    "lodash.throttle": "^4.1.1",
     "loglevel": "^1.6.4",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
+    "nav-frontend-alertstriper": "^3.0.6",
+    "nav-frontend-alertstriper-style": "^2.0.5",
     "nav-frontend-core": "^4.0.10",
     "nav-frontend-ikoner-assets": "^1.0.2",
     "nav-frontend-js-utils": "^1.0.7",
