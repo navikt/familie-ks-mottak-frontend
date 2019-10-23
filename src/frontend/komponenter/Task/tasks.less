@@ -43,4 +43,32 @@
     &__metadata {
         padding: 1rem;
     }
+
+    &__vislogg {
+        grid-area: 2 e("/") 3;
+    }
+
+    &__logg {
+        border-top: 1px solid @navGra20;
+        grid-area: 3 e("/") 4 e("/") 5 e("/") 1;
+        height: auto;
+        padding: 1rem;
+
+        &--item {
+            padding-bottom: 1rem;
+
+            &-stacktrace {
+                word-break: break-all;
+                word-wrap: break-word;
+                white-space: pre-wrap;
+                font: inherit;
+                margin: 0;
+            }
+        }
+
+        &.skjul {
+            height: 0;
+            display: none;
+        }
+    }
 }
