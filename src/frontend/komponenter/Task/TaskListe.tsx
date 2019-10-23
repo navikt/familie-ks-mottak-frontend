@@ -1,17 +1,27 @@
+import * as moment from 'moment';
+import AlertStripe from 'nav-frontend-alertstriper';
 import * as React from 'react';
-import { ITask } from '../../typer/task';
+import { ITaskDTO } from '../../typer/task';
 import TaskPanel from './TaskPanel';
 
 interface IProps {
-    tasks: ITask[];
+    tasksDTO: ITaskDTO[];
 }
 
-const TaskListe: React.StatelessComponent<IProps> = ({ tasks }) => {
+const TaskListe: React.StatelessComponent<IProps> = ({ tasksDTO }) => {
     return (
         <React.Fragment>
-            {tasks.map(task => {
-                return <TaskPanel key={task.id} task={task} />;
-            })}
+            {tasksDTO.length > 0 ? (
+                tasksDTO
+                    .sort((a, b) =>
+                        moment(a.task.opprettetTidspunkt).diff(b.task.opprettetTidspunkt)
+                    )
+                    .map(taskDTO => {
+                        return <TaskPanel key={taskDTO.task.id} taskDTO={taskDTO} />;
+                    })
+            ) : (
+                <AlertStripe type={'info'} children={'Ingen feilede tasks'} />
+            )}
         </React.Fragment>
     );
 };

@@ -1,20 +1,31 @@
 import AlertStripe from 'nav-frontend-alertstriper';
+import { Knapp } from 'nav-frontend-knapper';
 import { Systemtittel } from 'nav-frontend-typografi';
 import * as React from 'react';
 import { RessursStatus } from '../../typer/ressurs';
-import { useTaskContext } from '../TaskProvider';
+import { actions, useTaskContext, useTaskDispatch } from '../TaskProvider';
 import TaskListe from './TaskListe';
 
 const Tasks: React.FunctionComponent = () => {
     const tasks = useTaskContext().tasks;
+    const tasksDispatcher = useTaskDispatch();
 
     switch (tasks.status) {
         case RessursStatus.SUKSESS:
             return (
                 <React.Fragment>
-                    <Systemtittel children={'Feilede tasks'} />
+                    <div className={'tasks__topbar'}>
+                        <Systemtittel children={'Feilede tasks'} />
+                        <Knapp
+                            onClick={() =>
+                                tasksDispatcher({ payload: true, type: actions.REKJØR_ALLE_TASKS })
+                            }
+                        >
+                            Rekjør alle tasks
+                        </Knapp>
+                    </div>
                     <br />
-                    <TaskListe tasks={tasks.data} />
+                    <TaskListe tasksDTO={tasks.data} />
                 </React.Fragment>
             );
         case RessursStatus.HENTER:

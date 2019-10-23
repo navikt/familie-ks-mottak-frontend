@@ -54,6 +54,13 @@ export const taskStatusTekster: ITaskStatusTekster = {
 };
 
 // Interface
+export interface ITaskDTO {
+    task: ITask;
+    journalpostID?: string;
+    saksnummer?: string;
+    søkerFødselsnummer: string;
+}
+
 export interface ITask {
     id: number;
     opprettetTidspunkt: string;
