@@ -14,7 +14,7 @@ const TaskListe: React.StatelessComponent<IProps> = ({ tasksDTO }) => {
             {tasksDTO.length > 0 ? (
                 tasksDTO
                     .sort((a, b) =>
-                        moment(a.task.opprettetTidspunkt).diff(b.task.opprettetTidspunkt)
+                        moment(b.task.opprettetTidspunkt).diff(a.task.opprettetTidspunkt)
                     )
                     .map(taskDTO => {
                         return <TaskPanel key={taskDTO.task.id} taskDTO={taskDTO} />;
