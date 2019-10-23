@@ -59,7 +59,7 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
             </Knapp>
 
             <div className={classNames('taskpanel__logg', visLogg ? '' : 'skjul')}>
-                {task.logg.map((logg: ITaskLogg, index: number) => {
+                {task.logg.reverse().map((logg: ITaskLogg, index: number) => {
                     const feilmelding = logg.feilmelding ? JSON.parse(logg.feilmelding) : undefined;
                     return (
                         <div key={index} className={'taskpanel__logg--item'}>
