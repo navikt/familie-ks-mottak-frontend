@@ -10,7 +10,7 @@
     margin: 1rem 0;
     padding: 0;
     display: grid;
-    grid-template-columns: 10rem 1fr 10rem;
+    grid-template-columns: 10rem 1fr 10rem 10rem;
     grid-template-rows: 5rem 1fr;
 
     &__status {
@@ -36,30 +36,43 @@
         grid-area: 1 e("/") 2 e("/") 3 e("/") 2;
         padding: 1rem;
         border-left: 1px solid @navGra20;
-        border-right: 1px solid @navGra20;
+        
         width: 100%;
     }
 
+    &__lenker {
+        grid-area: 1 e("/") 3;
+        border-right: 1px solid @navGra20;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+
     &__metadata {
+        grid-area: 1 e("/") 4;
         padding: 1rem;
     }
 
     &__vislogg {
-        grid-area: 2 e("/") 3;
+        grid-area: 2 e("/") 4;
     }
 
     &__logg {
         border-top: 1px solid @navGra20;
-        grid-area: 3 e("/") 4 e("/") 5 e("/") 1;
+        grid-area: 3 e("/") 5 e("/") 3 e("/") 1;
         height: auto;
         padding: 1rem;
 
         &--item {
-            display: flex;
+            display: grid;
+            grid-template-columns: 15rem 1fr;
             padding-bottom: 1.5rem;
+            word-break: break-all;
+            word-wrap: break-word;
+            white-space: pre-wrap;
 
             & pre {
-                margin-left: 3rem;
+                margin-left: 1rem;
             }
 
             &-stacktrace {

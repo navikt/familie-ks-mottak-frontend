@@ -1,6 +1,7 @@
 import * as classNames from 'classnames';
 import * as moment from 'moment';
 import { Knapp } from 'nav-frontend-knapper';
+import Lenke from 'nav-frontend-lenker';
 import PanelBase from 'nav-frontend-paneler';
 import { Element, Normaltekst, Undertittel } from 'nav-frontend-typografi';
 import * as React from 'react';
@@ -16,6 +17,8 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
 
     const tasksDispatcher = useTaskDispatch();
     const task = taskDTO.task;
+    const kibanaErrorLenke = `https://logs.adeo.no/app/kibana#/discover/48543ce0-877e-11e9-b511-6967c3e45603?_g=(refreshInterval:(pause:!t,value:0),time:(from:'${task.opprettetTidspunkt}',mode:relative,to:now))&_a=(columns:!(message,envclass,environment,level,application,host),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'logstash-apps-*',key:team,negate:!f,params:(query:teamfamilie,type:phrase),type:phrase,value:teamfamilie),query:(match:(team:(query:teamfamilie,type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'96e648c0-980a-11e9-830a-e17bbd64b4db',key:level,negate:!f,params:(query:Error,type:phrase),type:phrase,value:Error),query:(match:(level:(query:Error,type:phrase))))),index:'96e648c0-980a-11e9-830a-e17bbd64b4db',interval:auto,query:(language:lucene,query:${taskDTO.task.callId}),sort:!('@timestamp',desc))`;
+    const kibanaInfoLenke = `https://logs.adeo.no/app/kibana#/discover/48543ce0-877e-11e9-b511-6967c3e45603?_g=(refreshInterval:(pause:!t,value:0),time:(from:'${task.opprettetTidspunkt}',mode:relative,to:now))&_a=(columns:!(message,envclass,environment,level,application,host),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'logstash-apps-*',key:team,negate:!f,params:(query:teamfamilie,type:phrase),type:phrase,value:teamfamilie),query:(match:(team:(query:teamfamilie,type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'96e648c0-980a-11e9-830a-e17bbd64b4db',key:level,negate:!f,params:(query:Info,type:phrase),type:phrase,value:Info),query:(match:(level:(query:Info,type:phrase))))),index:'96e648c0-980a-11e9-830a-e17bbd64b4db',interval:auto,query:(language:lucene,query:${taskDTO.task.callId}),sort:!('@timestamp',desc))`;
 
     return (
         <PanelBase className={'taskpanel'} border={true}>
@@ -41,6 +44,11 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
                 <Normaltekst
                     children={`Saksnummer: ${taskDTO.saksnummer ? taskDTO.saksnummer : 'ukjent'}`}
                 />
+            </div>
+
+            <div className={'taskpanel__lenker'}>
+                <Lenke href={kibanaErrorLenke} children={'Kibana error'} />
+                <Lenke href={kibanaInfoLenke} children={'Kibana info'} />
             </div>
 
             <div className={'taskpanel__metadata'}>
