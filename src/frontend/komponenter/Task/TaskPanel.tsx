@@ -6,7 +6,6 @@ import { Element, Normaltekst, Undertittel } from 'nav-frontend-typografi';
 import * as React from 'react';
 import { ITaskDTO, ITaskLogg, taskStatusTekster, taskTypeTekster } from '../../typer/task';
 import { actions, useTaskDispatch } from '../TaskProvider';
-import { formatException } from './format';
 
 interface IProps {
     taskDTO: ITaskDTO;
@@ -63,7 +62,16 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
                     const feilmelding = logg.feilmelding ? JSON.parse(logg.feilmelding) : undefined;
                     return (
                         <div key={index} className={'taskpanel__logg--item'}>
-                            <Element children={logg.type} />
+                            <div>
+                                <Element children={logg.type} />
+                                <Normaltekst
+                                    children={moment(logg.opprettetTidspunkt).format(
+                                        'DD.MM.YYYY HH:mm'
+                                    )}
+                                />
+                                <Normaltekst children={logg.node} />
+                            </div>
+
                             {feilmelding && (
                                 <pre
                                     className={'taskpanel__logg--item-stacktrace'}
