@@ -76,4 +76,6 @@ export interface ITask {
 export interface ITaskLogg {
     type: loggType;
     feilmelding?: string;
+    node: string;
+    opprettetTidspunkt: string;
 }
