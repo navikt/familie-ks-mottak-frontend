@@ -2,6 +2,7 @@ import * as moment from 'moment';
 import AlertStripe from 'nav-frontend-alertstriper';
 import * as React from 'react';
 import { ITaskDTO } from '../../typer/task';
+import { useTaskContext } from '../TaskProvider';
 import TaskPanel from './TaskPanel';
 
 interface IProps {
@@ -9,6 +10,8 @@ interface IProps {
 }
 
 const TaskListe: React.StatelessComponent<IProps> = ({ tasksDTO }) => {
+    const statusFilter = useTaskContext().statusFilter;
+
     return (
         <React.Fragment>
             {tasksDTO.length > 0 ? (
@@ -20,7 +23,7 @@ const TaskListe: React.StatelessComponent<IProps> = ({ tasksDTO }) => {
                         return <TaskPanel key={taskDTO.task.id} taskDTO={taskDTO} />;
                     })
             ) : (
-                <AlertStripe type={'info'} children={'Ingen feilede tasks'} />
+                <AlertStripe type={'info'} children={`Ingen tasker med status ${statusFilter}`} />
             )}
         </React.Fragment>
     );

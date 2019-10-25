@@ -1,3 +1,4 @@
+import Modal from 'nav-frontend-modal';
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { hentInnloggetBruker } from '../api/saksbehandler';
@@ -6,7 +7,9 @@ import Dekoratør from './Felleskomponenter/Dekoratør/Dekoratør';
 import Tasks from './Task/Tasks';
 import { TaskProvider } from './TaskProvider';
 
-const App: React.FunctionalComponent = () => {
+Modal.setAppElement(document.getElementById('modal-a11y-wrapper'));
+
+const App: React.FunctionComponent = () => {
     const [innloggetSaksbehandler, settInnloggetSaksbehandler] = React.useState<ISaksbehandler>();
 
     React.useEffect(() => {
