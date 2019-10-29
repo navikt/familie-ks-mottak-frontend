@@ -1,5 +1,6 @@
 // Enum
 export enum avvikstyper {
+    ANNET = 'ANNET',
     DUPLIKAT = 'DUPLIKAT',
 }
 
