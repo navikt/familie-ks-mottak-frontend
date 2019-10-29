@@ -1,5 +1,6 @@
 import * as moment from 'moment';
 import AlertStripe from 'nav-frontend-alertstriper';
+import { Element } from 'nav-frontend-typografi';
 import * as React from 'react';
 import { ITaskDTO } from '../../typer/task';
 import { useTaskContext } from '../TaskProvider';
@@ -12,20 +13,18 @@ interface IProps {
 const TaskListe: React.StatelessComponent<IProps> = ({ tasksDTO }) => {
     const statusFilter = useTaskContext().statusFilter;
 
-    return (
+    return tasksDTO.length > 0 ? (
         <React.Fragment>
-            {tasksDTO.length > 0 ? (
-                tasksDTO
-                    .sort((a, b) =>
-                        moment(b.task.opprettetTidspunkt).diff(a.task.opprettetTidspunkt)
-                    )
-                    .map(taskDTO => {
-                        return <TaskPanel key={taskDTO.task.id} taskDTO={taskDTO} />;
-                    })
-            ) : (
-                <AlertStripe type={'info'} children={`Ingen tasker med status ${statusFilter}`} />
-            )}
+            <Element children={`Viser ${tasksDTO.length} tasker`} />
+
+            {tasksDTO
+                .sort((a, b) => moment(b.task.opprettetTidspunkt).diff(a.task.opprettetTidspunkt))
+                .map(taskDTO => {
+                    return <TaskPanel key={taskDTO.task.id} taskDTO={taskDTO} />;
+                })}
         </React.Fragment>
+    ) : (
+        <AlertStripe type={'info'} children={`Ingen tasker med status ${statusFilter}`} />
     );
 };
 
