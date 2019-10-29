@@ -1,4 +1,9 @@
 // Enum
+export enum avvikstyper {
+    ANNET = 'ANNET',
+    DUPLIKAT = 'DUPLIKAT',
+}
+
 export enum taskStatus {
     AVVIKS_HÅNDTERT = 'AVVIKS_HÅNDTERT',
     BEHANDLER = 'BEHANDLER',
@@ -62,20 +67,28 @@ export interface ITaskDTO {
 }
 
 export interface ITask {
+    avvikstype: avvikstyper;
+    callId: string;
     id: number;
+    logg: ITaskLogg[];
+    metadata: any;
     opprettetTidspunkt: string;
     payload: string;
     status: taskStatus;
     triggerTid: string;
     type: taskTyper;
-    metadata: any;
-    logg: ITaskLogg[];
-    callId: string;
 }
 
 export interface ITaskLogg {
-    type: loggType;
-    feilmelding?: string;
+    endretAv: string;
+    melding?: string;
     node: string;
     opprettetTidspunkt: string;
+    type: loggType;
+}
+
+export interface IAvvikshåndteringDTO {
+    taskId: string;
+    årsak: string;
+    avvikstype: avvikstyper;
 }

@@ -7,6 +7,7 @@ import { Element, Normaltekst, Undertittel } from 'nav-frontend-typografi';
 import * as React from 'react';
 import { ITaskDTO, ITaskLogg, taskStatusTekster, taskTypeTekster } from '../../typer/task';
 import { actions, useTaskDispatch } from '../TaskProvider';
+import AvvikshåndteringModal from './AvvikshåndteringModal/AvvikshåndteringModal';
 
 interface IProps {
     taskDTO: ITaskDTO;
@@ -14,6 +15,7 @@ interface IProps {
 
 const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
     const [visLogg, settVisLogg] = React.useState(false);
+    const [visAvvikshåndteringModal, settVisAvvikshåndteringModal] = React.useState(false);
 
     const tasksDispatcher = useTaskDispatch();
     const task = taskDTO.task;
@@ -22,6 +24,11 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
 
     return (
         <PanelBase className={'taskpanel'} border={true}>
+            <AvvikshåndteringModal
+                settÅpen={settVisAvvikshåndteringModal}
+                task={task}
+                åpen={visAvvikshåndteringModal}
+            />
             <div className={classNames('taskpanel__status', task.status)}>
                 <Element children={taskStatusTekster[task.status]} />
             </div>
@@ -49,6 +56,14 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
             <div className={'taskpanel__lenker'}>
                 <Lenke href={kibanaErrorLenke} children={'Kibana error'} />
                 <Lenke href={kibanaInfoLenke} children={'Kibana info'} />
+                <Lenke
+                    href={''}
+                    onClick={event => {
+                        settVisAvvikshåndteringModal(!visAvvikshåndteringModal);
+                        event.preventDefault();
+                    }}
+                    children={'Avvikshåndter'}
+                />
             </div>
 
             <div className={'taskpanel__metadata'}>
@@ -67,11 +82,18 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
 
             <div className={classNames('taskpanel__logg', visLogg ? '' : 'skjul')}>
                 {task.logg.reverse().map((logg: ITaskLogg, index: number) => {
-                    const feilmelding = logg.feilmelding ? JSON.parse(logg.feilmelding) : undefined;
+                    let melding;
+                    try {
+                        melding = logg.melding ? JSON.parse(logg.melding).stacktrace : undefined;
+                    } catch (error) {
+                        melding = logg.melding ? logg.melding : undefined;
+                    }
+
                     return (
                         <div key={index} className={'taskpanel__logg--item'}>
                             <div>
                                 <Element children={logg.type} />
+                                <Normaltekst children={`Endret av: ${logg.endretAv}`} />
                                 <Normaltekst
                                     children={moment(logg.opprettetTidspunkt).format(
                                         'DD.MM.YYYY HH:mm'
@@ -80,10 +102,10 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
                                 <Normaltekst children={logg.node} />
                             </div>
 
-                            {feilmelding && (
+                            {melding && (
                                 <pre
-                                    className={'taskpanel__logg--item-stacktrace'}
-                                    children={feilmelding.stacktrace}
+                                    className={'taskpanel__logg--item-melding'}
+                                    children={melding}
                                 />
                             )}
                         </div>

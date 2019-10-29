@@ -13,7 +13,7 @@ const lesMockFil = filnavn => {
     }
 };
 
-app.get('/familie-ks-mottak/api/task/feilede', (req, res) => {
+app.get('/familie-ks-mottak/api/task', (req, res) => {
     setTimeout(() => res.send(lesMockFil(`tasks-feilede.json`)), delayMs);
 });
 

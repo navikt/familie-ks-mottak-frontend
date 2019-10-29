@@ -1,15 +1,17 @@
 import { AxiosError } from 'axios';
 import * as React from 'react';
-import { hentTasks, rekjørTask } from '../api/task';
+import { avvikshåndterTask, hentTasks, rekjørTask } from '../api/task';
 import { byggFeiletRessurs, byggTomRessurs, Ressurs, RessursStatus } from '../typer/ressurs';
-import { ITaskDTO } from '../typer/task';
+import { IAvvikshåndteringDTO, ITaskDTO, taskStatus } from '../typer/task';
 
 export enum actions {
+    AVVIKSHÅNDTER_TASK = 'AVVIKSHÅNDTER_TASK',
     HENT_TASKS = 'HENT_TASKS',
     HENT_TASKS_FEILET = 'HENT_TASKS_FEILET',
     HENT_TASKS_SUKSESS = 'HENT_TASKS_SUKSESS',
     REKJØR_ALLE_TASKS = 'REKJØR_ALLE_TASKS',
     REKJØR_TASK = 'REKJØR_TASK',
+    SETT_FILTER = 'SETT_FILTER',
 }
 
 interface IAction {
@@ -20,6 +22,8 @@ interface IAction {
 type Dispatch = (action: IAction) => void;
 
 interface IState {
+    avvikshåndteringDTO: IAvvikshåndteringDTO | undefined;
+    statusFilter: taskStatus;
     rekjørAlle: boolean;
     rekjørId: string;
     tasks: Ressurs<ITaskDTO[]>;
@@ -30,6 +34,12 @@ const TaskDispatchContext = React.createContext<Dispatch | undefined>(undefined)
 
 const TaskReducer = (state: IState, action: IAction): IState => {
     switch (action.type) {
+        case actions.AVVIKSHÅNDTER_TASK: {
+            return {
+                ...state,
+                avvikshåndteringDTO: action.payload,
+            };
+        }
         case actions.HENT_TASKS: {
             return {
                 ...state,
@@ -62,6 +72,12 @@ const TaskReducer = (state: IState, action: IAction): IState => {
                 rekjørId: action.payload,
             };
         }
+        case actions.SETT_FILTER: {
+            return {
+                ...state,
+                statusFilter: action.payload,
+            };
+        }
         default: {
             throw new Error(`Uhåndtert action type: ${action.type}`);
         }
@@ -70,14 +86,15 @@ const TaskReducer = (state: IState, action: IAction): IState => {
 
 const TaskProvider: React.StatelessComponent = ({ children }) => {
     const [state, dispatch] = React.useReducer(TaskReducer, {
+        avvikshåndteringDTO: undefined,
         rekjørAlle: false,
         rekjørId: '',
+        statusFilter: taskStatus.FEILET,
         tasks: byggTomRessurs<ITaskDTO[]>(),
     });
 
-    React.useEffect(() => {
-        dispatch({ type: actions.HENT_TASKS });
-        hentTasks()
+    const internHentTasks = () => {
+        hentTasks(state.statusFilter)
             .then((tasks: Ressurs<ITaskDTO[]>) => {
                 dispatch({
                     payload: tasks,
@@ -90,22 +107,22 @@ const TaskProvider: React.StatelessComponent = ({ children }) => {
                     type: actions.HENT_TASKS_FEILET,
                 });
             });
-    }, []);
+    };
+
+    React.useEffect(() => {
+        dispatch({ type: actions.HENT_TASKS });
+        internHentTasks();
+    }, [state.statusFilter]);
 
     React.useEffect(() => {
         if (state.rekjørAlle || state.rekjørId !== '') {
-            rekjørTask(!state.rekjørAlle ? state.rekjørId : '')
-                .then((tasks: Ressurs<ITaskDTO[]>) => {
-                    dispatch({
-                        payload: tasks,
-                        type: actions.HENT_TASKS_SUKSESS,
-                    });
+            rekjørTask(state.statusFilter, !state.rekjørAlle ? state.rekjørId : '')
+                .then(() => {
+                    internHentTasks();
                 })
                 .catch((error: AxiosError) => {
-                    dispatch({
-                        payload: byggFeiletRessurs('Ukent feil ved innhenting av Task', error),
-                        type: actions.HENT_TASKS_FEILET,
-                    });
+                    // tslint:disable-next-line: no-console
+                    console.log('Rekjøring av task feilet');
                 });
 
             dispatch({
@@ -119,6 +136,19 @@ const TaskProvider: React.StatelessComponent = ({ children }) => {
             });
         }
     }, [state.rekjørId, state.rekjørAlle]);
+
+    React.useEffect(() => {
+        if (state.avvikshåndteringDTO !== undefined) {
+            avvikshåndterTask(state.avvikshåndteringDTO)
+                .then(() => {
+                    internHentTasks();
+                })
+                .catch((error: AxiosError) => {
+                    // tslint:disable-next-line: no-console
+                    console.log('Avvikshåndtering av task feilet');
+                });
+        }
+    }, [state.avvikshåndteringDTO]);
 
     return (
         <TaskStateContext.Provider value={state}>
