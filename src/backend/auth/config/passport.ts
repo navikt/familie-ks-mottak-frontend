@@ -26,18 +26,16 @@ export default (passport: any) => {
                 done: VerifyCallback
             ) => {
                 if (!profile.oid) {
-                    return done(new Error('No oid found'), undefined);
+                    done(new Error('No oid found'), undefined);
                 }
                 process.nextTick(() => {
                     req.session.oid = profile.oid;
-                    req.session.upn = profile.upn;
+                    req.session.upn = profile._json.preferred_username;
                     req.session.displayName = profile.displayName;
-                    req.session.firstName = profile.name ? profile.name.givenName : '-';
-                    req.session.lastName = profile.name ? profile.name.familyName : '-';
-                    req.session.groups = JSON.parse(profile._json.groups);
+                    req.session.groups = profile._json.groups;
                     req.session.refreshToken = refresh_token;
 
-                    return done(undefined, profile);
+                    done(undefined, profile);
                 });
             }
         )

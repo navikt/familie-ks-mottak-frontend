@@ -3,6 +3,7 @@ import passport from 'passport';
 import { logError } from '../../customLoglevel';
 import { nodeConfig } from '../config/passportConfig';
 import { SessionRequest } from './session';
+import { validateRefreshAndGetToken } from './token';
 
 export const authenticateAzure = (req: SessionRequest, res: Response, next: NextFunction) => {
     const regex: RegExpExecArray | null = /redirectUrl=(.*)/.exec(req.url);
@@ -37,6 +38,7 @@ export const authenticateAzureCallback = () => {
 export const ensureAuthenticated = (sendUnauthorized: boolean) => {
     return async (req: SessionRequest, res: Response, next: NextFunction) => {
         if (req.isAuthenticated()) {
+            validateRefreshAndGetToken(req);
             return next();
         }
 
@@ -50,9 +52,10 @@ export const ensureAuthenticated = (sendUnauthorized: boolean) => {
 };
 
 export const logout = (req: SessionRequest, res: Response) => {
-    req.session.destroy(error => {
-        logError(req, `error during logout: ${error}`);
-        res.status(500).send(error);
-    });
     res.redirect(nodeConfig.logoutUri);
+    req.session.destroy(error => {
+        if (error) {
+            logError(req, `error during logout: ${error}`);
+        }
+    });
 };
