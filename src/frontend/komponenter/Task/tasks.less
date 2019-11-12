@@ -11,7 +11,6 @@
     padding: 0;
     display: grid;
     grid-template-columns: 10rem 1fr 10rem 10rem;
-    grid-template-rows: 5rem 1fr;
 
     &__status {
         grid-area: 1 e("/") 1;
@@ -35,9 +34,17 @@
     &__innhold {
         grid-area: 1 e("/") 2 e("/") 3 e("/") 2;
         padding: 1rem;
-        border-left: 1px solid @navGra20;
-        
+        border-left: 1px solid @navGra20;        
         width: 100%;
+
+        &--elementer {
+            column-count: 2;
+            width: 90%;
+            
+            @media (max-width: 1200px) {
+                column-count: 1;
+            }
+        }
     }
 
     &__lenker {
@@ -88,5 +95,13 @@
             height: 0;
             display: none;
         }
+    }
+}
+
+.taskelement {
+    display: flex;
+
+    & .typo-element {
+        margin-right: .25rem;
     }
 }
