@@ -1,4 +1,5 @@
-import { IOIDCStrategyOptionWithRequest } from 'passport-azure-ad';
+import { IOIDCStrategyOptionWithRequest } from '@navikt/familie-backend';
+import { ISessionKonfigurasjon } from '@navikt/familie-backend/lib/typer';
 
 interface IConfig {
     allowHttpForRedirectUrl: boolean;
@@ -50,16 +51,10 @@ const hentPassportConfig = () => {
             break;
     }
 
-    const key1 = process.env.PASSPORTCOOKIE_KEY1 ? process.env.PASSPORTCOOKIE_KEY1 : '';
-    const key2 = process.env.PASSPORTCOOKIE_KEY2 ? process.env.PASSPORTCOOKIE_KEY2 : '';
-    const key3 = process.env.PASSPORTCOOKIE_KEY3 ? process.env.PASSPORTCOOKIE_KEY3 : '';
-    const key4 = process.env.PASSPORTCOOKIE_KEY4 ? process.env.PASSPORTCOOKIE_KEY4 : '';
-
     return {
         ...config,
         clientID: process.env.CLIENT_ID ? process.env.CLIENT_ID : 'invalid',
         clientSecret: process.env.CLIENT_SECRET ? process.env.CLIENT_SECRET : '',
-        cookieEncryptionKeys: [{ key: key1, iv: key3 }, { key: key2, iv: key4 }],
         identityMetadata: `https://login.microsoftonline.com/${config.tenant}/v2.0/.well-known/openid-configuration`,
         tokenURI: `https://login.microsoftonline.com/${config.tenant}/oauth2/v2.0/token`,
         useCookieInsteadOfSession: false,
@@ -68,12 +63,16 @@ const hentPassportConfig = () => {
 };
 
 export const nodeConfig = hentPassportConfig();
+export const sessionConfig: ISessionKonfigurasjon = {
+    cookieSecret: process.env.SESSION_SECRET,
+    navn: 'familie-ks-mottak',
+    sessionSecret: process.env.SESSION_SECRET,
+};
 
 export const passportConfig: IOIDCStrategyOptionWithRequest = {
     allowHttpForRedirectUrl: nodeConfig.allowHttpForRedirectUrl,
     clientID: nodeConfig.clientID,
     clientSecret: nodeConfig.clientSecret,
-    cookieEncryptionKeys: nodeConfig.cookieEncryptionKeys,
     identityMetadata: nodeConfig.identityMetadata,
     loggingLevel: 'warn',
     passReqToCallback: true,

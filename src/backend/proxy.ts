@@ -1,10 +1,11 @@
+import { validerEllerOppdaterOnBehalfOfToken } from '@navikt/familie-backend';
+import { SessionRequest } from '@navikt/familie-backend/lib/typer';
 import { NextFunction, Request, Response } from 'express';
 import { ClientRequest } from 'http';
 import proxy from 'http-proxy-middleware';
 import uuid from 'uuid';
-import { proxyUrl } from '../../Environment';
-import { SessionRequest } from './session';
-import { validateRefreshAndGetOnBehalfOfToken } from './token';
+import { nodeConfig } from './config';
+import { proxyUrl } from './Environment';
 
 const restream = (proxyReq: ClientRequest, req: Request, res: Response) => {
     if (req.body) {
@@ -31,7 +32,13 @@ export const doProxy = () => {
 
 export const attachToken = () => {
     return async (req: SessionRequest, res: Response, next: NextFunction) => {
-        const accessToken = await validateRefreshAndGetOnBehalfOfToken(req);
+        const accessToken = await validerEllerOppdaterOnBehalfOfToken(req, {
+            clientId: nodeConfig.clientID,
+            clientSecret: nodeConfig.clientSecret,
+            redirectUrl: nodeConfig.redirectUrl,
+            scope: process.env.KS_MOTTAK_SCOPE,
+            tokenUri: nodeConfig.tokenURI,
+        });
         req.headers['Nav-Call-Id'] = uuid.v1();
         req.headers.Authorization = `Bearer ${accessToken}`;
         return next();

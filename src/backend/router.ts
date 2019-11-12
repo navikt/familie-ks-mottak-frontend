@@ -1,20 +1,16 @@
 import express, { NextFunction, Response } from 'express';
 import path from 'path';
+import { buildPath } from './Environment';
 import {
     authenticateAzure,
     authenticateAzureCallback,
     ensureAuthenticated,
+    hentBrukerprofil,
     logout,
-} from './auth/utils/authenticate';
-import { SessionRequest } from './auth/utils/session';
-import { getUserProfile } from './auth/utils/user';
-import { buildPath } from './Environment';
+} from '@navikt/familie-backend';
+import { SessionRequest } from '@navikt/familie-backend/lib/typer';
 
 const router = express.Router();
-
-/* tslint:disable */
-const packageJson = require('../package.json');
-/* tslint:enable */
 
 export default (middleware: any) => {
     router.get('/version', (req, res) => {
@@ -28,10 +24,10 @@ export default (middleware: any) => {
         authenticateAzure(req, res, next);
     });
     router.post('/auth/openid/callback', authenticateAzureCallback());
-    router.get('/auth/logout', logout);
+    router.get('/auth/logout', (req: SessionRequest, res: Response) => logout(req, res, ''));
 
     // USER
-    router.get('/user/profile', ensureAuthenticated(true), getUserProfile());
+    router.get('/user/profile', ensureAuthenticated(true), hentBrukerprofil());
 
     // APP
     if (process.env.NODE_ENV === 'development') {
