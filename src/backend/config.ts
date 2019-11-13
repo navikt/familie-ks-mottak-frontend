@@ -1,6 +1,7 @@
 import { IOIDCStrategyOptionWithRequest } from '@navikt/familie-backend';
-import { ISessionKonfigurasjon } from '@navikt/familie-backend/lib/typer';
+import { ISessionKonfigurasjon, ITokenRequest } from '@navikt/familie-backend/lib/typer';
 
+// Generer auth config basert på miljø
 interface IConfig {
     allowHttpForRedirectUrl: boolean;
     cookieDomain: string;
@@ -62,11 +63,28 @@ const hentPassportConfig = () => {
     };
 };
 
+// Sett opp config mot felles backend skall
 export const nodeConfig = hentPassportConfig();
 export const sessionConfig: ISessionKonfigurasjon = {
     cookieSecret: process.env.SESSION_SECRET,
     navn: 'familie-ks-mottak',
     sessionSecret: process.env.SESSION_SECRET,
+};
+
+export const saksbehandlerTokenConfig: ITokenRequest = {
+    clientId: nodeConfig.clientID,
+    clientSecret: nodeConfig.clientSecret,
+    redirectUrl: nodeConfig.redirectUrl,
+    scope: `${nodeConfig.clientID}/.default`,
+    tokenUri: nodeConfig.tokenURI,
+};
+
+export const oboTokenConfig: ITokenRequest = {
+    clientId: nodeConfig.clientID,
+    clientSecret: nodeConfig.clientSecret,
+    redirectUrl: nodeConfig.redirectUrl,
+    scope: process.env.KS_MOTTAK_SCOPE,
+    tokenUri: nodeConfig.tokenURI,
 };
 
 export const passportConfig: IOIDCStrategyOptionWithRequest = {
@@ -83,3 +101,31 @@ export const passportConfig: IOIDCStrategyOptionWithRequest = {
     useCookieInsteadOfSession: nodeConfig.useCookieInsteadOfSession,
     validateIssuer: nodeConfig.validateIssuer,
 };
+
+// Miljøvariabler
+const Environment = () => {
+    if (process.env.ENV === 'local') {
+        return {
+            buildPath: '../frontend_development',
+            namespace: 'local',
+            proxyUrl: 'http://localhost:8084',
+        };
+    } else if (process.env.ENV === 'preprod') {
+        return {
+            buildPath: '../frontend_production',
+            namespace: 'preprod',
+            proxyUrl: 'http://familie-ks-mottak',
+        };
+    }
+
+    return {
+        buildPath: '../frontend_production',
+        namespace: 'production',
+        proxyUrl: 'http://familie-ks-mottak',
+    };
+};
+const env = Environment();
+
+export const buildPath = env.buildPath;
+export const proxyUrl = env.proxyUrl;
+export const namespace = env.namespace;

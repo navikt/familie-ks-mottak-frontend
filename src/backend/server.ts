@@ -1,5 +1,4 @@
-import { ensureAuthenticated, konfigurerBackend } from '@navikt/familie-backend';
-import { getLogTimestamp } from '@navikt/familie-backend/lib/customLoglevel';
+import { ensureAuthenticated, getLogTimestamp, konfigurerBackend } from '@navikt/familie-backend';
 import { IFamilieBackend } from '@navikt/familie-backend/lib/typer';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -12,16 +11,16 @@ import webpackHotMiddleware from 'webpack-hot-middleware';
 import { attachToken, doProxy } from './proxy';
 import setupRouter from './router';
 
-import { passportConfig, sessionConfig } from './config';
+import { passportConfig, saksbehandlerTokenConfig, sessionConfig } from './config';
 
 /* tslint:disable */
 const config = require('../build_n_deploy/webpack/webpack.dev');
 /* tslint:enable */
 
+loglevel.setDefaultLevel(loglevel.levels.INFO);
 const familieBackend: IFamilieBackend = konfigurerBackend(passportConfig, sessionConfig);
 
 familieBackend.app.use(helmet());
-loglevel.setDefaultLevel(loglevel.levels.INFO);
 
 const port = 8000;
 
@@ -44,7 +43,7 @@ if (process.env.NODE_ENV === 'development') {
 
 familieBackend.app.use(
     '/familie-ks-mottak/api',
-    ensureAuthenticated(true),
+    ensureAuthenticated(true, saksbehandlerTokenConfig),
     attachToken(),
     doProxy()
 );
