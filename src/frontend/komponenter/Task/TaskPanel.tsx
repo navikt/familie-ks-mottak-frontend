@@ -5,9 +5,16 @@ import Lenke from 'nav-frontend-lenker';
 import PanelBase from 'nav-frontend-paneler';
 import { Element, Normaltekst, Undertittel } from 'nav-frontend-typografi';
 import * as React from 'react';
-import { ITaskDTO, ITaskLogg, taskStatusTekster, taskTypeTekster } from '../../typer/task';
+import {
+    ITaskDTO,
+    ITaskLogg,
+    loggType,
+    taskStatusTekster,
+    taskTypeTekster,
+} from '../../typer/task';
 import { actions, useTaskDispatch } from '../TaskProvider';
 import AvvikshåndteringModal from './AvvikshåndteringModal/AvvikshåndteringModal';
+import TaskElement from './TaskElement';
 
 interface IProps {
     taskDTO: ITaskDTO;
@@ -42,15 +49,27 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
 
             <div className={'taskpanel__innhold'}>
                 <Undertittel children={`#${task.id}: ${taskTypeTekster[task.type]}`} />
-                <Normaltekst children={`Søkers fødselsnummer: ${taskDTO.søkerFødselsnummer}`} />
-                <Normaltekst
-                    children={`Journalpost: ${
-                        taskDTO.journalpostID ? taskDTO.journalpostID : 'ukjent'
-                    }`}
-                />
-                <Normaltekst
-                    children={`Saksnummer: ${taskDTO.saksnummer ? taskDTO.saksnummer : 'ukjent'}`}
-                />
+                <div className={'taskpanel__innhold--elementer'}>
+                    <TaskElement
+                        label={'Søkers fødselsnummer'}
+                        innhold={taskDTO.søkerFødselsnummer}
+                    />
+                    <TaskElement
+                        label={'Journalpost'}
+                        innhold={taskDTO.journalpostID ? taskDTO.journalpostID : 'ukjent'}
+                    />
+                    <TaskElement
+                        label={'Saksnummer'}
+                        innhold={taskDTO.saksnummer ? taskDTO.saksnummer : 'ukjent'}
+                    />
+                    <TaskElement label={'Call-id'} innhold={taskDTO.task.callId} />
+                    <TaskElement
+                        label={'Sist kjørt'}
+                        innhold={moment(
+                            hentSisteBehandlerLoggmelding(taskDTO.task.logg).opprettetTidspunkt
+                        ).format('DD.MM.YYYY HH:mm')}
+                    />
+                </div>
             </div>
 
             <div className={'taskpanel__lenker'}>
@@ -114,6 +133,10 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
             </div>
         </PanelBase>
     );
+};
+
+const hentSisteBehandlerLoggmelding = (logg: ITaskLogg[]) => {
+    return logg.filter((l: ITaskLogg) => l.type === loggType.BEHANDLER).slice(-1)[0];
 };
 
 export default TaskPanel;
