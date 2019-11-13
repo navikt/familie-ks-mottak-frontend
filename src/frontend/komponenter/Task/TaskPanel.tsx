@@ -64,10 +64,6 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
                     />
                     <TaskElement label={'Call-id'} innhold={taskDTO.task.callId} />
                     <TaskElement
-                        label={'Triggertid'}
-                        innhold={moment(taskDTO.task.triggerTid).format('DD.MM.YYYY HH:mm')}
-                    />
-                    <TaskElement
                         label={'Sist kjørt'}
                         innhold={moment(
                             hentSisteBehandlerLoggmelding(taskDTO.task.logg).opprettetTidspunkt
