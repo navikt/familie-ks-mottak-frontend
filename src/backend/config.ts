@@ -1,5 +1,8 @@
-import { IOIDCStrategyOptionWithRequest } from '@navikt/familie-backend';
-import { ISessionKonfigurasjon, ITokenRequest } from '@navikt/familie-backend/lib/typer';
+import {
+    IOIDCStrategyOptionWithRequest,
+    ISessionKonfigurasjon,
+    ITokenRequest,
+} from '@navikt/familie-backend/lib/typer';
 
 // Generer auth config basert på miljø
 interface IConfig {

@@ -1,5 +1,4 @@
-import { ensureAuthenticated, getLogTimestamp, konfigurerBackend } from '@navikt/familie-backend';
-import { IFamilieBackend } from '@navikt/familie-backend/lib/typer';
+import Backend from '@navikt/familie-backend';
 import bodyParser from 'body-parser';
 import express from 'express';
 import helmet from 'helmet';
@@ -18,9 +17,9 @@ const config = require('../build_n_deploy/webpack/webpack.dev');
 /* tslint:enable */
 
 loglevel.setDefaultLevel(loglevel.levels.INFO);
-const familieBackend: IFamilieBackend = konfigurerBackend(passportConfig, sessionConfig);
+const backend = new Backend(passportConfig, sessionConfig, saksbehandlerTokenConfig);
 
-familieBackend.app.use(helmet());
+backend.getApp().use(helmet());
 
 const port = 8000;
 
@@ -32,33 +31,34 @@ if (process.env.NODE_ENV === 'development') {
         publicPath: config.output.publicPath,
     });
 
-    familieBackend.app.use(middleware);
-    familieBackend.app.use(webpackHotMiddleware(compiler));
+    backend.getApp().use(middleware);
+    backend.getApp().use(webpackHotMiddleware(compiler));
 } else {
-    familieBackend.app.use(
-        '/assets',
-        express.static(path.join(__dirname, '..', 'frontend_production'))
-    );
+    backend
+        .getApp()
+        .use('/assets', express.static(path.join(__dirname, '..', 'frontend_production')));
 }
 
-familieBackend.app.use(
-    '/familie-ks-mottak/api',
-    ensureAuthenticated(true, saksbehandlerTokenConfig),
-    attachToken(),
-    doProxy()
-);
+backend
+    .getApp()
+    .use(
+        '/familie-ks-mottak/api',
+        backend.ensureAuthenticated(true, saksbehandlerTokenConfig),
+        attachToken(backend),
+        doProxy()
+    );
 
 // Sett opp bodyParser og router etter proxy. Spesielt viktig med tanke på større payloads som blir parset av bodyParser
-familieBackend.app.use(bodyParser.json({ limit: '200mb' }));
-familieBackend.app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
-familieBackend.app.use('/', setupRouter(middleware));
+backend.getApp().use(bodyParser.json({ limit: '200mb' }));
+backend.getApp().use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
+backend.getApp().use('/', setupRouter(backend, middleware));
 
-familieBackend.app.listen(port, '0.0.0.0', (err: Error) => {
+backend.getApp().listen(port, '0.0.0.0', (err: Error) => {
     if (err) {
-        loglevel.error(`${getLogTimestamp()}: server startup failed - ${err}`);
+        loglevel.error(`${backend.getLogTimestamp()}: server startup failed - ${err}`);
     }
     loglevel.info(
-        `${getLogTimestamp()}: server startet på port ${port}. Build version: ${
+        `${backend.getLogTimestamp()}: server startet på port ${port}. Build version: ${
             process.env.APP_VERSION
         }.`
     );
