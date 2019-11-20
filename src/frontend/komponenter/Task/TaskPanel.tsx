@@ -28,6 +28,9 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
     const task = taskDTO.task;
     const kibanaErrorLenke = `https://logs.adeo.no/app/kibana#/discover/48543ce0-877e-11e9-b511-6967c3e45603?_g=(refreshInterval:(pause:!t,value:0),time:(from:'${task.opprettetTidspunkt}',mode:relative,to:now))&_a=(columns:!(message,envclass,environment,level,application,host),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'logstash-apps-*',key:team,negate:!f,params:(query:teamfamilie,type:phrase),type:phrase,value:teamfamilie),query:(match:(team:(query:teamfamilie,type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'96e648c0-980a-11e9-830a-e17bbd64b4db',key:level,negate:!f,params:(query:Error,type:phrase),type:phrase,value:Error),query:(match:(level:(query:Error,type:phrase))))),index:'96e648c0-980a-11e9-830a-e17bbd64b4db',interval:auto,query:(language:lucene,query:${taskDTO.task.callId}),sort:!('@timestamp',desc))`;
     const kibanaInfoLenke = `https://logs.adeo.no/app/kibana#/discover/48543ce0-877e-11e9-b511-6967c3e45603?_g=(refreshInterval:(pause:!t,value:0),time:(from:'${task.opprettetTidspunkt}',mode:relative,to:now))&_a=(columns:!(message,envclass,environment,level,application,host),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'logstash-apps-*',key:team,negate:!f,params:(query:teamfamilie,type:phrase),type:phrase,value:teamfamilie),query:(match:(team:(query:teamfamilie,type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'96e648c0-980a-11e9-830a-e17bbd64b4db',key:level,negate:!f,params:(query:Info,type:phrase),type:phrase,value:Info),query:(match:(level:(query:Info,type:phrase))))),index:'96e648c0-980a-11e9-830a-e17bbd64b4db',interval:auto,query:(language:lucene,query:${taskDTO.task.callId}),sort:!('@timestamp',desc))`;
+    const sortertTaskLogg = task.logg.sort((a, b) =>
+        moment(b.opprettetTidspunkt).diff(moment(a.opprettetTidspunkt))
+    );
 
     return (
         <PanelBase className={'taskpanel'} border={true}>
@@ -62,12 +65,12 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
                         label={'Saksnummer'}
                         innhold={taskDTO.saksnummer ? taskDTO.saksnummer : 'ukjent'}
                     />
-                    <TaskElement label={'Call-id'} innhold={taskDTO.task.callId} />
+                    <TaskElement label={'Call-id'} innhold={taskDTO.task.metadata.callId} />
                     <TaskElement
                         label={'Sist kjørt'}
-                        innhold={moment(
-                            hentSisteBehandlerLoggmelding(taskDTO.task.logg).opprettetTidspunkt
-                        ).format('DD.MM.YYYY HH:mm')}
+                        innhold={moment(sortertTaskLogg[0].opprettetTidspunkt).format(
+                            'DD.MM.YYYY HH:mm'
+                        )}
                     />
                 </div>
             </div>
@@ -100,7 +103,7 @@ const TaskPanel: React.StatelessComponent<IProps> = ({ taskDTO }) => {
             </Knapp>
 
             <div className={classNames('taskpanel__logg', visLogg ? '' : 'skjul')}>
-                {task.logg.reverse().map((logg: ITaskLogg, index: number) => {
+                {sortertTaskLogg.map((logg: ITaskLogg, index: number) => {
                     let melding;
                     try {
                         melding = logg.melding ? JSON.parse(logg.melding).stacktrace : undefined;
