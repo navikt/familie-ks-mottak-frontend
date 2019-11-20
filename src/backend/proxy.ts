@@ -1,10 +1,10 @@
+import Backend from '@navikt/familie-backend';
+import { SessionRequest } from '@navikt/familie-backend/lib/typer';
 import { NextFunction, Request, Response } from 'express';
 import { ClientRequest } from 'http';
 import proxy from 'http-proxy-middleware';
 import uuid from 'uuid';
-import { proxyUrl } from '../../Environment';
-import { SessionRequest } from './session';
-import { validateRefreshAndGetOnBehalfOfToken } from './token';
+import { oboTokenConfig, proxyUrl, saksbehandlerTokenConfig } from './config';
 
 const restream = (proxyReq: ClientRequest, req: Request, res: Response) => {
     if (req.body) {
@@ -29,9 +29,13 @@ export const doProxy = () => {
     });
 };
 
-export const attachToken = () => {
+export const attachToken = (backend: Backend) => {
     return async (req: SessionRequest, res: Response, next: NextFunction) => {
-        const accessToken = await validateRefreshAndGetOnBehalfOfToken(req);
+        const accessToken = await backend.validerEllerOppdaterOnBehalfOfToken(
+            req,
+            saksbehandlerTokenConfig,
+            oboTokenConfig
+        );
         req.headers['Nav-Call-Id'] = uuid.v1();
         req.headers.Authorization = `Bearer ${accessToken}`;
         return next();
