@@ -1,25 +1,30 @@
 import { Ressurs } from '../typer/ressurs';
+import { IService } from '../typer/service';
 import { IAvvikshåndteringDTO, ITaskDTO, taskStatus } from '../typer/task';
 import { axiosRequest } from './axios';
 
-export const hentTasks = (statusFilter: taskStatus): Promise<Ressurs<ITaskDTO[]>> => {
+export const hentTasks = (
+    valgtService: IService,
+    statusFilter: taskStatus
+): Promise<Ressurs<ITaskDTO[]>> => {
     return axiosRequest({
         headers: {
             status: statusFilter,
         },
         method: 'GET',
-        url: `/familie-ks-mottak/api/task`,
+        url: `${valgtService.proxyPath}/task`,
     });
 };
 
 export const rekjørTask = (
+    valgtService: IService,
     statusFilter: taskStatus,
     taskId?: string
 ): Promise<Ressurs<ITaskDTO[]>> => {
     if (taskId) {
         return axiosRequest({
             method: 'PUT',
-            url: `/familie-ks-mottak/api/task/rekjor${taskId ? `?taskId=${taskId}` : ''}`,
+            url: `${valgtService.proxyPath}i/task/rekjor${taskId ? `?taskId=${taskId}` : ''}`,
         });
     } else {
         return axiosRequest({
@@ -27,12 +32,13 @@ export const rekjørTask = (
                 status: statusFilter,
             },
             method: 'PUT',
-            url: `/familie-ks-mottak/api/task/rekjorAlle`,
+            url: `${valgtService.proxyPath}i/task/rekjorAlle`,
         });
     }
 };
 
 export const avvikshåndterTask = (
+    valgtService: IService,
     avvikshåndteringDTO: IAvvikshåndteringDTO
 ): Promise<Ressurs<ITaskDTO[]>> => {
     return axiosRequest({
@@ -41,6 +47,6 @@ export const avvikshåndterTask = (
             årsak: avvikshåndteringDTO.årsak,
         },
         method: 'PUT',
-        url: `/familie-ks-mottak/api/task/avvikshaandter?taskId=${avvikshåndteringDTO.taskId}`,
+        url: `${valgtService.proxyPath}i/task/avvikshaandter?taskId=${avvikshåndteringDTO.taskId}`,
     });
 };
