@@ -24,7 +24,7 @@ export const rekjørTask = (
     if (taskId) {
         return axiosRequest({
             method: 'PUT',
-            url: `${valgtService.proxyPath}i/task/rekjor${taskId ? `?taskId=${taskId}` : ''}`,
+            url: `${valgtService.proxyPath}/task/rekjor${taskId ? `?taskId=${taskId}` : ''}`,
         });
     } else {
         return axiosRequest({
@@ -32,7 +32,7 @@ export const rekjørTask = (
                 status: statusFilter,
             },
             method: 'PUT',
-            url: `${valgtService.proxyPath}i/task/rekjorAlle`,
+            url: `${valgtService.proxyPath}/task/rekjorAlle`,
         });
     }
 };
@@ -47,6 +47,6 @@ export const avvikshåndterTask = (
             årsak: avvikshåndteringDTO.årsak,
         },
         method: 'PUT',
-        url: `${valgtService.proxyPath}i/task/avvikshaandter?taskId=${avvikshåndteringDTO.taskId}`,
+        url: `${valgtService.proxyPath}/task/avvikshaandter?taskId=${avvikshåndteringDTO.taskId}`,
     });
 };
