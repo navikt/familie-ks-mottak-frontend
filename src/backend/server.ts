@@ -9,6 +9,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import { attachToken, doProxy } from './proxy';
 import setupRouter from './router';
+import { IService, serviceConfig } from './serviceConfig';
 
 import { passportConfig, saksbehandlerTokenConfig, sessionConfig } from './config';
 
@@ -39,14 +40,16 @@ if (process.env.NODE_ENV === 'development') {
         .use('/assets', express.static(path.join(__dirname, '..', 'frontend_production')));
 }
 
-backend
-    .getApp()
-    .use(
-        '/familie-ks-mottak/api',
-        backend.ensureAuthenticated(true, saksbehandlerTokenConfig),
-        attachToken(backend),
-        doProxy()
-    );
+serviceConfig.map((service: IService) => {
+    backend
+        .getApp()
+        .use(
+            service.proxyPath,
+            backend.ensureAuthenticated(true, saksbehandlerTokenConfig),
+            attachToken(service, backend),
+            doProxy(service)
+        );
+});
 
 // Sett opp bodyParser og router etter proxy. Spesielt viktig med tanke på større payloads som blir parset av bodyParser
 backend.getApp().use(bodyParser.json({ limit: '200mb' }));

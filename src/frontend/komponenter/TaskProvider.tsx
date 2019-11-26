@@ -2,7 +2,9 @@ import { AxiosError } from 'axios';
 import * as React from 'react';
 import { avvikshåndterTask, hentTasks, rekjørTask } from '../api/task';
 import { byggFeiletRessurs, byggTomRessurs, Ressurs, RessursStatus } from '../typer/ressurs';
+import { IService } from '../typer/service';
 import { IAvvikshåndteringDTO, ITaskDTO, taskStatus } from '../typer/task';
+import { useServiceContext } from './ServiceProvider';
 
 export enum actions {
     AVVIKSHÅNDTER_TASK = 'AVVIKSHÅNDTER_TASK',
@@ -23,9 +25,9 @@ type Dispatch = (action: IAction) => void;
 
 interface IState {
     avvikshåndteringDTO: IAvvikshåndteringDTO | undefined;
-    statusFilter: taskStatus;
     rekjørAlle: boolean;
     rekjørId: string;
+    statusFilter: taskStatus;
     tasks: Ressurs<ITaskDTO[]>;
 }
 
@@ -85,6 +87,7 @@ const TaskReducer = (state: IState, action: IAction): IState => {
 };
 
 const TaskProvider: React.StatelessComponent = ({ children }) => {
+    const valgtService: IService | undefined = useServiceContext().valgtService;
     const [state, dispatch] = React.useReducer(TaskReducer, {
         avvikshåndteringDTO: undefined,
         rekjørAlle: false,
@@ -94,29 +97,31 @@ const TaskProvider: React.StatelessComponent = ({ children }) => {
     });
 
     const internHentTasks = () => {
-        hentTasks(state.statusFilter)
-            .then((tasks: Ressurs<ITaskDTO[]>) => {
-                dispatch({
-                    payload: tasks,
-                    type: actions.HENT_TASKS_SUKSESS,
+        if (valgtService) {
+            hentTasks(valgtService, state.statusFilter)
+                .then((tasks: Ressurs<ITaskDTO[]>) => {
+                    dispatch({
+                        payload: tasks,
+                        type: actions.HENT_TASKS_SUKSESS,
+                    });
+                })
+                .catch((error: AxiosError) => {
+                    dispatch({
+                        payload: byggFeiletRessurs('Ukent feil ved innhenting av Task', error),
+                        type: actions.HENT_TASKS_FEILET,
+                    });
                 });
-            })
-            .catch((error: AxiosError) => {
-                dispatch({
-                    payload: byggFeiletRessurs('Ukent feil ved innhenting av Task', error),
-                    type: actions.HENT_TASKS_FEILET,
-                });
-            });
+        }
     };
 
     React.useEffect(() => {
         dispatch({ type: actions.HENT_TASKS });
         internHentTasks();
-    }, [state.statusFilter]);
+    }, [state.statusFilter, valgtService]);
 
     React.useEffect(() => {
-        if (state.rekjørAlle || state.rekjørId !== '') {
-            rekjørTask(state.statusFilter, !state.rekjørAlle ? state.rekjørId : '')
+        if (valgtService && (state.rekjørAlle || state.rekjørId !== '')) {
+            rekjørTask(valgtService, state.statusFilter, !state.rekjørAlle ? state.rekjørId : '')
                 .then(() => {
                     internHentTasks();
                 })
@@ -138,8 +143,8 @@ const TaskProvider: React.StatelessComponent = ({ children }) => {
     }, [state.rekjørId, state.rekjørAlle]);
 
     React.useEffect(() => {
-        if (state.avvikshåndteringDTO !== undefined) {
-            avvikshåndterTask(state.avvikshåndteringDTO)
+        if (valgtService && state.avvikshåndteringDTO !== undefined) {
+            avvikshåndterTask(valgtService, state.avvikshåndteringDTO)
                 .then(() => {
                     internHentTasks();
                 })

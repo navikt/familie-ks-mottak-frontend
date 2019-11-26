@@ -1,9 +1,11 @@
 import Modal from 'nav-frontend-modal';
 import * as React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
 import { hentInnloggetBruker } from '../api/saksbehandler';
 import { ISaksbehandler } from '../typer/saksbehandler';
 import Dekoratør from './Felleskomponenter/Dekoratør/Dekoratør';
+import { ServiceProvider } from './ServiceProvider';
+import Services from './Services/Services';
 import Tasks from './Task/Tasks';
 import { TaskProvider } from './TaskProvider';
 
@@ -19,28 +21,33 @@ const App: React.FunctionComponent = () => {
     }, []);
 
     return (
-        <TaskProvider>
-            <Dekoratør
-                innloggetSaksbehandler={innloggetSaksbehandler}
-                tittel={'Oppgavebehandling'}
-                onClick={() => {
-                    window.location.href = `${window.origin}/auth/logout`;
-                }}
-            />
-            <div className={'container'}>
-                <Router>
+        <Router>
+            <ServiceProvider>
+                <Dekoratør
+                    innloggetSaksbehandler={innloggetSaksbehandler}
+                    tittel={'Oppgavebehandling'}
+                    onClick={() => {
+                        window.location.href = `${window.origin}/auth/logout`;
+                    }}
+                />
+                <div className={'container'}>
                     <Switch>
+                        <Route exact={true} path={'/'} component={Services} />
                         <Route
                             exact={true}
-                            path="/"
+                            path="/service/:service"
                             render={({ match }) => {
-                                return <Tasks />;
+                                return (
+                                    <TaskProvider>
+                                        <Tasks serviceId={match.params.service} />
+                                    </TaskProvider>
+                                );
                             }}
                         />
                     </Switch>
-                </Router>
-            </div>
-        </TaskProvider>
+                </div>
+            </ServiceProvider>
+        </Router>
     );
 };
 

@@ -4,7 +4,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ClientRequest } from 'http';
 import proxy from 'http-proxy-middleware';
 import uuid from 'uuid';
-import { oboTokenConfig, proxyUrl, saksbehandlerTokenConfig } from './config';
+import { oboTokenConfig, saksbehandlerTokenConfig } from './config';
+import { IService } from './serviceConfig';
 
 const restream = (proxyReq: ClientRequest, req: Request, res: Response) => {
     if (req.body) {
@@ -15,26 +16,29 @@ const restream = (proxyReq: ClientRequest, req: Request, res: Response) => {
     }
 };
 
-export const doProxy = () => {
-    return proxy('/familie-ks-mottak/api', {
+export const doProxy = (service: IService) => {
+    return proxy(service.proxyPath, {
         changeOrigin: true,
         logLevel: 'info',
         onProxyReq: restream,
         pathRewrite: (path, req) => {
-            const newPath = path.replace('/familie-ks-mottak/api', '');
+            const newPath = path.replace(service.proxyPath, '');
             return `/api${newPath}`;
         },
         secure: true,
-        target: `${proxyUrl}`,
+        target: `${service.proxyUrl}`,
     });
 };
 
-export const attachToken = (backend: Backend) => {
+export const attachToken = (service: IService, backend: Backend) => {
     return async (req: SessionRequest, res: Response, next: NextFunction) => {
         const accessToken = await backend.validerEllerOppdaterOnBehalfOfToken(
             req,
             saksbehandlerTokenConfig,
-            oboTokenConfig
+            {
+                ...oboTokenConfig,
+                scope: service.azureScope,
+            }
         );
         req.headers['Nav-Call-Id'] = uuid.v1();
         req.headers.Authorization = `Bearer ${accessToken}`;
