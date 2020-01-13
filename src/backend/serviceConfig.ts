@@ -16,6 +16,7 @@ if (process.env.ENV === 'local') {
 } else {
     proxyUrls = {
         barnetrygd_mottak: 'http://familie-ba-mottak',
+        barnetrygd_sak: 'http://familie-ba-sak',
         kontantstøtte: 'http://familie-ks-mottak',
     };
 }
