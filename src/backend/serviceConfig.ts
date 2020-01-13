@@ -9,12 +9,13 @@ export interface IService {
 let proxyUrls: { [key: string]: string } = {};
 if (process.env.ENV === 'local') {
     proxyUrls = {
-        barnetrygd: 'http://localhost:8090',
+        barnetrygd_mottak: 'http://localhost:8090',
+        barnetrygd_sak: 'http://localhost:8089',
         kontantstøtte: 'http://localhost:8084',
     };
 } else {
     proxyUrls = {
-        barnetrygd: 'http://familie-ba-mottak',
+        barnetrygd_mottak: 'http://familie-ba-mottak',
         kontantstøtte: 'http://familie-ks-mottak',
     };
 }
@@ -29,9 +30,16 @@ export const serviceConfig: IService[] = [
     },
     {
         azureScope: process.env.BA_MOTTAK_SCOPE,
-        displayName: 'Barnetrygd',
+        displayName: 'Barnetrygd mottak',
         id: 'familie-ba-mottak',
         proxyPath: '/familie-ba-mottak/api',
-        proxyUrl: proxyUrls.barnetrygd,
+        proxyUrl: proxyUrls.barnetrygd_mottak,
+    },
+    {
+        azureScope: process.env.BA_SAK_SCOPE,
+        displayName: 'Barnetrygd sak',
+        id: 'familie-ba-sak',
+        proxyPath: '/familie-ba-sak/api',
+        proxyUrl: proxyUrls.barnetrygd_sak,
     },
 ];
